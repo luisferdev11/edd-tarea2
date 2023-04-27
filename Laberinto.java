@@ -5,7 +5,7 @@ import java.util.Stack;
 public class Laberinto {
     private class Casilla{
         // Si es verdadero significa que la casilla tiene una parde en esa direccion
-        private boolean izquierda, abajo, recorrida;
+        private boolean izquierda, abajo, recorrida, solucion;
         private int x, y;
         // private ArrayList<Casilla> vecinosVisitados;
 
@@ -13,6 +13,7 @@ public class Laberinto {
             izquierda = true;
             abajo = true;
             recorrida = false;
+            solucion = false;
             this.x = x;
             this.y = y;
             // vecinosVisitados = new ArrayList<>();
@@ -53,32 +54,33 @@ public class Laberinto {
         }
     }
 
-    private Direccion obtenerVecino(Casilla casilla, ArrayList<Casilla> visitados){
+    private Direccion obtenerVecino(Casilla casilla){
         ArrayList<Direccion> opciones = new ArrayList<>();
         try{
             Casilla aux = laberinto[casilla.y - 1][casilla.x];
-            if(!visitados.contains(aux))
+            if(!aux.recorrida)
                 opciones.add(Direccion.ARR);
         }catch(Exception e){}
         try{
             Casilla aux = laberinto[casilla.y + 1][casilla.x];
-            if(!visitados.contains(aux))
+            if(!aux.recorrida)
                 opciones.add(Direccion.ABJ);
         }catch(Exception e){}
         try{
             Casilla aux = laberinto[casilla.y][casilla.x - 1];
-            if(!visitados.contains(aux))
+            if(!aux.recorrida)
                 opciones.add(Direccion.IZQ);
         }catch(Exception e){}
         try{
             Casilla aux = laberinto[casilla.y][casilla.x + 1];
-            if(!visitados.contains(aux))
+            if(!aux.recorrida)
                 opciones.add(Direccion.DER);
         }catch(Exception e){}
 
         if(opciones.size() == 0) return null;
         Direccion seleccionada = opciones.get(random.nextInt(opciones.size()));
-        visitados.add(getRelative(casilla, seleccionada));
+        Casilla visitada = getRelative(casilla, seleccionada);
+        visitada.recorrida = true;
         return seleccionada;
     }
 
@@ -105,7 +107,7 @@ public class Laberinto {
         for(int i = 0; i < y; i++){
             for(int j = 0; j < x; j++){
                 salida += laberinto[i][j].izquierda ? "|" : " ";
-                String aux = laberinto[i][j].recorrida ? "X" : " ";
+                String aux = laberinto[i][j].solucion ? "X" : " ";
                 salida += laberinto[i][j].abajo ? underline(aux) : aux;
             }
             salida += "| \n";
@@ -116,14 +118,13 @@ public class Laberinto {
     public void generarLaberinto(){
         resetLaberinto();
         Stack<Casilla> pila = new Stack<>();
-        ArrayList<Casilla> visitados = new ArrayList<>();
         int actualX = 0;
         int actualY = 0;
         // deberiamos añadir la actual a las vistaiadas??
         Casilla actual = laberinto[actualY][actualX];
         pila.push(actual);
         while(!pila.empty()){
-            Direccion dirSiguiente = obtenerVecino(actual, visitados);
+            Direccion dirSiguiente = obtenerVecino(actual);
             if(dirSiguiente == null){
                 actual = pila.pop();
                 continue;
