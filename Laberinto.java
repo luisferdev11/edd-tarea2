@@ -132,6 +132,7 @@ public class Laberinto {
             Casilla casillaSiguiente = getRelative(actual, dirSiguiente);
             pila.push(casillaSiguiente);
             borrarPared(actual, casillaSiguiente, dirSiguiente);
+            actual = pila.peek();
         }
     }
 
