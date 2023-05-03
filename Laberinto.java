@@ -3,19 +3,19 @@ import java.util.Random;
 import java.util.Stack;
 
 public class Laberinto {
-    private class Casilla{
+    private class Casilla{ //subclase de casilla
         // Si es verdadero significa que la casilla tiene una parde en esa direccion
-        private boolean izquierda, abajo, recorrida, solucion;
-        private int x, y;
+        private boolean izquierda, abajo, recorrida, solucion; //atributos de casilla
+        private int x, y; //atributos de casilla
         // private ArrayList<Casilla> vecinosVisitados;
 
-        private Casilla(int x, int y){
-            izquierda = true;
+        private Casilla(int x, int y){ // contructor de casilla, recibe x y y como parametros y los asigna a los atributos de casilla  
+            izquierda = true; 
             abajo = true;
             recorrida = false;
             solucion = false;
-            this.x = x;
-            this.y = y;
+            this.x = x; // posicion de la casilla en x
+            this.y = y; //posicion de la casilla en y
             // vecinosVisitados = new ArrayList<>();
         }
     }
@@ -37,24 +37,24 @@ public class Laberinto {
         }
     }
 
-    private Casilla[][] laberinto;
-    private int x, y;
+    private Casilla[][] laberinto; //se crea un arreglo de casillas llamado laberinto
+    private int x, y; // atributos de laberinto
     private static final Random random = new Random();
 
     private Laberinto(){}
 
-    public Laberinto(int x, int y){
+    public Laberinto(int x, int y){ //constructor de laberinto, recibe x y y como parametros y los asigna a los atributos de laberinto
         this.x = x;
         this.y = y;
-        laberinto = new Casilla[y][x];
+        laberinto = new Casilla[y][x]; // se crea un arreglo de casillas con las dimensiones de x y y
         for(int i = 0; i < y; i++){
             for(int j = 0; j < x; j++){
-                laberinto[i][j] = new Casilla(j, i);
+                laberinto[i][j] = new Casilla(j, i); // se crea una casilla en cada posicion del arreglo
             }
         }
     }
 
-    private Direccion obtenerVecino(Casilla casilla){
+    private Direccion obtenerVecino(Casilla casilla){ // metodo que recibe una casilla como parametro y regresa una direccion si es que hay una casilla vecina que no ha sido visitada
         ArrayList<Direccion> opciones = new ArrayList<>();
         try{
             Casilla aux = laberinto[casilla.y - 1][casilla.x];
@@ -88,7 +88,7 @@ public class Laberinto {
         return "\033[4m" + string + "\033[0m";
     }
 
-    private Casilla getRelative(Casilla casilla, Direccion dir){
+    private Casilla getRelative(Casilla casilla, Direccion dir){ // metodo que recibe una casilla y una direccion y regresa la casilla vecina en esa direccion
         return
             dir == Direccion.ARR ? laberinto[casilla.y - 1][casilla.x] :
             dir == Direccion.ABJ ? laberinto[casilla.y + 1][casilla.x] :
@@ -155,5 +155,72 @@ public class Laberinto {
                 laberinto[i][j] = new Casilla(j, i);
             }
         }
+    }
+
+    public void resolverLaberinto(){
+        resetSolucion();
+        Stack<Casilla> pila = new Stack<>();
+        int actualX = 0;
+        int actualY = 0;
+        Casilla actual = laberinto[actualY][actualX];
+        Casilla meta = laberinto[y - 1][x - 1];
+        pila.push(actual);
+        while(actual != meta){
+            Direccion dirSiguiente = obtenerVecinoAccesible(actual);
+            if(dirSiguiente == null){
+                actual = pila.pop();
+                actual = pila.peek();
+                continue;
+            }
+            Casilla casillaSiguiente = getRelative(actual, dirSiguiente);
+            pila.push(casillaSiguiente);
+            actual = pila.peek();
+        }
+        for(int i = 0; i < pila.size(); i++){
+            Casilla aux = pila.get(i);
+            aux.solucion = true;
+        }
+    }    
+    public void resetSolucion(){
+        for(int i = 0; i < y; i++){
+            for(int j = 0; j < x; j++){
+                laberinto[i][j].solucion = false;
+                laberinto[i][j].recorrida = false;
+            }
+        }
+    }
+    private Direccion obtenerVecinoAccesible(Casilla casilla){
+        ArrayList<Direccion> opciones = new ArrayList<>();
+        try{
+            Casilla aux = laberinto[casilla.y - 1][casilla.x];
+            if((!aux.recorrida) && aux.abajo == false)
+                opciones.add(Direccion.ARR);
+        }catch(Exception e){}
+        try{
+            Casilla aux = laberinto[casilla.y + 1][casilla.x];
+            if((!aux.recorrida) && casilla.abajo == false)
+                opciones.add(Direccion.ABJ);
+        }catch(Exception e){}
+        try{
+            Casilla aux = laberinto[casilla.y][casilla.x - 1];
+            if((!aux.recorrida) && casilla.izquierda == false)
+                opciones.add(Direccion.IZQ);
+        }catch(Exception e){}
+        try{
+            Casilla aux = laberinto[casilla.y][casilla.x + 1];
+            if((!aux.recorrida) && aux.izquierda == false)
+                opciones.add(Direccion.DER);
+        }catch(Exception e){}
+        // System.out.println("x" + casilla.x);
+        // System.out.println("y" + casilla.y);
+        // System.out.println(opciones.size());
+        if(opciones.size() == 0)
+            return null;
+        Direccion seleccionada = opciones.get(random.nextInt(opciones.size()));
+        Casilla regreso = getRelative(casilla, seleccionada);
+        // visitados.add(regreso);
+        regreso.recorrida = true;
+        // regreso.recorrida = true;
+        return seleccionada;
     }
 }
