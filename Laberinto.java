@@ -120,8 +120,9 @@ public class Laberinto {
         Stack<Casilla> pila = new Stack<>();
         int actualX = 0;
         int actualY = 0;
-        // deberiamos añadir la actual a las vistaiadas??
+        // deberiamos añadir la actual a las vistaiadas?? Si
         Casilla actual = laberinto[actualY][actualX];
+        actual.recorrida = true;
         pila.push(actual);
         while(!pila.empty()){
             Direccion dirSiguiente = obtenerVecino(actual);
@@ -163,12 +164,13 @@ public class Laberinto {
         int actualX = 0;
         int actualY = 0;
         Casilla actual = laberinto[actualY][actualX];
+        actual.recorrida = true;
         Casilla meta = laberinto[y - 1][x - 1];
         pila.push(actual);
         while(actual != meta){
             Direccion dirSiguiente = obtenerVecinoAccesible(actual);
             if(dirSiguiente == null){
-                actual = pila.pop();
+                pila.pop();
                 actual = pila.peek();
                 continue;
             }
