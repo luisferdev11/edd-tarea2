@@ -40,6 +40,8 @@ public class Laberinto {
     private Casilla[][] laberinto; //se crea un arreglo de casillas llamado laberinto
     private int x, y; // atributos de laberinto
     private static final Random random = new Random();
+    private int primeraX, primeraY;
+    private int ultimaX, ultimaY;
 
     private Laberinto(){}
 
@@ -52,6 +54,8 @@ public class Laberinto {
                 laberinto[i][j] = new Casilla(j, i); // se crea una casilla en cada posicion del arreglo
             }
         }
+        setPrimera(0, 0);
+        setUltima(x - 1, y - 1);
     }
 
     private Direccion obtenerVecino(Casilla casilla){ // metodo que recibe una casilla como parametro y regresa una direccion si es que hay una casilla vecina que no ha sido visitada
@@ -99,6 +103,8 @@ public class Laberinto {
 
     @Override
     public String toString(){
+        Casilla primera = laberinto[primeraY][primeraX];
+        Casilla ultima = laberinto[ultimaY][ultimaX];
         String salida = " ";
         for(int i = 0; i < x; i++){
             salida += underline(" ") + " ";
@@ -107,7 +113,10 @@ public class Laberinto {
         for(int i = 0; i < y; i++){
             for(int j = 0; j < x; j++){
                 salida += laberinto[i][j].izquierda ? "|" : " ";
-                String aux = laberinto[i][j].solucion ? "X" : " ";
+                String aux =
+                    laberinto[i][j] == primera ? "I" :
+                    laberinto[i][j] == ultima ? "F" :
+                    laberinto[i][j].solucion ? "X" : " ";
                 salida += laberinto[i][j].abajo ? underline(aux) : aux;
             }
             salida += "| \n";
@@ -161,11 +170,11 @@ public class Laberinto {
     public void resolverLaberinto(){
         resetSolucion();
         Stack<Casilla> pila = new Stack<>();
-        int actualX = 0;
-        int actualY = 0;
-        Casilla actual = laberinto[actualY][actualX];
+        // int actualX = 0;
+        // int actualY = 0;
+        Casilla actual = laberinto[primeraY][primeraX];
         actual.recorrida = true;
-        Casilla meta = laberinto[y - 1][x - 1];
+        Casilla meta = laberinto[ultimaY][ultimaX];
         pila.push(actual);
         while(actual != meta){
             Direccion dirSiguiente = obtenerVecinoAccesible(actual);
@@ -182,7 +191,8 @@ public class Laberinto {
             Casilla aux = pila.get(i);
             aux.solucion = true;
         }
-    }    
+    }
+
     public void resetSolucion(){
         for(int i = 0; i < y; i++){
             for(int j = 0; j < x; j++){
@@ -224,5 +234,24 @@ public class Laberinto {
         regreso.recorrida = true;
         // regreso.recorrida = true;
         return seleccionada;
+    }
+
+    
+    /** Establece las coordenadas de la primera casilla de la solucion
+     * @param primeraX coordenada en el eje X empezando desde la izquierda
+     * @param primeraY coordenadan en el eje Y empezando desde arriba
+     */
+    public void setPrimera(int primeraX, int primeraY){
+        this.primeraX = primeraX;
+        this.primeraY = primeraY;
+    }
+
+    /** Establece las coordenadas de la ultima casilla de la solucion
+     * @param ultimaX coordenada en el eje X empezando desde la izquierda
+     * @param ultimaY coordenadan en el eje Y empezando desde arriba
+     */
+    public void setUltima(int ultimaX, int ultimaY){
+        this.ultimaX = ultimaX;
+        this.ultimaY = ultimaY;
     }
 }
