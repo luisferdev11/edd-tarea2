@@ -103,7 +103,7 @@ public class Main{
     }
 
     private static void outOfBounds(){
-        String msg = "El parametro size esta incompleto \n";
+        String msg = "Algun parametro esta incompleto \n";
         System.out.println("Error: " + msg);
         help();
     }
@@ -119,7 +119,7 @@ public class Main{
     }
 
     private static void dimensionesLaberinto(){
-        System.out.println("Las dimensiones del laberinto deben ser de al menos 1 \n");
+        System.out.println("Error: Las dimensiones del laberinto deben ser de al menos 1 \n");
         help();
     }
 }
