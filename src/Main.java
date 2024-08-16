@@ -5,7 +5,7 @@ public class Main{
             laberinto.generarLaberinto();
             laberinto.resolverLaberinto();
             System.out.println(laberinto.toString());
-            return; // Fin del programa
+            return; 
         }
         int sizeX = 10;
         int sizeY = 10;
